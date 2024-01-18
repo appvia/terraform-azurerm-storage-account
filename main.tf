@@ -112,7 +112,7 @@ resource "azurerm_storage_queue" "queues" {
 resource "azurerm_storage_blob" "example" {
   name                   = "CHANGELOG.md"
   storage_account_name   = azurerm_storage_account.self.name
-  storage_container_name = azurerm_storage_container.container.name
+  storage_container_name = azurerm_storage_container.container[0].name
   type                   = "Block"
   source                 = "CHANGELOG.md"
 }
