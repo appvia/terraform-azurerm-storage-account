@@ -10,6 +10,9 @@ terraform {
       source  = "aztfmod/azurecaf"
       version = ">= 1.2.16"
     }
+    azapi = {
+      source  = "aztfmod/azapi"
+      version = ">= 1.12.0"
+    }
   }
 }
-

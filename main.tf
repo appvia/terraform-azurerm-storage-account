@@ -83,12 +83,32 @@ resource "azurerm_advanced_threat_protection" "atp" {
   enabled            = var.enable_advanced_threat_protection
 }
 
-resource "azurerm_storage_container" "container" {
-  count                 = length(var.containers_list)
-  name                  = var.containers_list[count.index].name
-  storage_account_name  = azurerm_storage_account.self.name
-  container_access_type = var.containers_list[count.index].access_type
+resource "azapi_resource" "containers" {
+  count     = length(var.containers_list)
+  type      = "Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01"
+  name      = var.containers_list[count.index].name
+  parent_id = "${azurerm_storage_account.self.id}/blobServices/default"
+  body = jsonencode({
+    properties = {
+      defaultEncryptionScope      = "$account-encryption-key"
+      denyEncryptionScopeOverride = false
+      enableNfsV3AllSquash        = false
+      enableNfsV3RootSquash       = false
+      metadata                    = {}
+      publicAccess                = var.containers_list[count.index].access_type
+    }
+  })
+  depends_on = [
+    azurerm_storage_account.self
+  ]
 }
+
+# resource "azurerm_storage_container" "container" {
+#   count                 = length(var.containers_list)
+#   name                  = var.containers_list[count.index].name
+#   storage_account_name  = azurerm_storage_account.self.name
+#   container_access_type = var.containers_list[count.index].access_type
+# }
 
 resource "azurerm_storage_share" "fileshare" {
   count                = length(var.file_shares)
